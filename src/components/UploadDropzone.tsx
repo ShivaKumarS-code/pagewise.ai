@@ -128,62 +128,78 @@ export default function UploadDropzone() {
   )
 }*/
 
-
-import { useCallback, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { useUploadThing } from '@/lib/uploadthing'
-import { Loader2 } from 'lucide-react'
+import { useCallback, useState } from 'react'
 
 export default function UploadDropzone() {
-  const [isUploading, setIsUploading] = useState(false)
-  const [fileName, setFileName] = useState<string | null>(null)
+  const [uploading, setUploading] = useState(false)
+  const [uploadedUrl, setUploadedUrl] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
   const { startUpload } = useUploadThing('pdfUploader')
 
-  const onDrop = useCallback(
-    async (acceptedFiles: File[]) => {
-      const file = acceptedFiles[0]
-      if (!file) return
+  const onDrop = useCallback(async (acceptedFiles: File[]) => {
+    const file = acceptedFiles[0]
+    if (!file) return
 
-      setIsUploading(true)
-      setFileName(file.name)
+    setUploading(true)
+    setUploadedUrl(null)
+    setError(null)
 
-      try {
-        const res = await startUpload([file])
-        console.log('Upload complete:', res)
-      } catch (error) {
-        console.error('Upload failed:', error)
-      } finally {
-        setIsUploading(false)
+    try {
+      const res = await startUpload([file])
+      console.log('Upload response:', res)
+
+      if (res && res.length > 0) {
+        setUploadedUrl(res[0].url)
+      } else {
+        setError('Upload failed. Try again.')
       }
-    },
-    [startUpload]
-  )
+    } catch (err) {
+      console.error('Upload error:', err)
+      setError('Something went wrong during upload.')
+    } finally {
+      setUploading(false)
+    }
+  }, [startUpload])
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: {
-      'application/pdf': ['.pdf'],
-    },
-    multiple: false,
+    accept: { 'application/pdf': ['.pdf'] },
+    maxFiles: 1
   })
 
   return (
-    <div
-      {...getRootProps()}
-      className="border border-dashed border-gray-400 rounded-xl p-6 text-center cursor-pointer transition hover:bg-gray-100"
-    >
-      <input {...getInputProps()} />
-      {isUploading ? (
-        <div className="flex flex-col items-center space-y-2">
-          <Loader2 className="animate-spin h-6 w-6 text-gray-700" />
-          <p className="text-sm font-medium">Uploading {fileName}...</p>
-        </div>
-      ) : isDragActive ? (
-        <p className="text-sm text-gray-600">Drop the file here...</p>
-      ) : (
-        <p className="text-sm text-gray-600">
-          Drag & drop a PDF here, or click to select one
-        </p>
+    <div className="w-full max-w-md mx-auto">
+      <div
+        {...getRootProps()}
+        className="border-2 border-dashed p-6 rounded-xl text-center cursor-pointer transition hover:border-blue-400"
+      >
+        <input {...getInputProps()} />
+        {uploading ? (
+          <div className="flex flex-col items-center gap-2">
+            <p>Uploading file...</p>
+            <div className="w-full h-2 bg-gray-200 rounded">
+              <div className="h-full w-full animate-pulse bg-blue-500 rounded" />
+            </div>
+          </div>
+        ) : uploadedUrl ? (
+          <p className="text-green-600">
+            ✅ Upload complete!{' '}
+            <a href={uploadedUrl} target="_blank" className="underline text-blue-600">
+              View file
+            </a>
+          </p>
+        ) : isDragActive ? (
+          <p>Drop the PDF here...</p>
+        ) : (
+          <p>Click or drag a PDF to upload</p>
+        )}
+      </div>
+
+      {error && (
+        <p className="text-red-600 mt-2 text-center">{error}</p>
       )}
     </div>
   )
