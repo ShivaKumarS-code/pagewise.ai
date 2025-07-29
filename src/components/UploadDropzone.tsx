@@ -132,16 +132,38 @@ export default function UploadDropzone() {
 
 import { useState, useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
-import { Cloud, File } from 'lucide-react'
+import { Cloud, File, Loader2 } from 'lucide-react'
+import { Progress } from './ui/progress'
 
 export default function UploadDropzone() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [isUploading, setIsUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0)
+
+  const startSimulatedProgress = () => {
+    setUploadProgress(0)
+    const interval = setInterval(() => {
+      setUploadProgress((prev) => {
+        if (prev >= 95) {
+          clearInterval(interval)
+          return prev
+        }
+        return prev + 5
+      })
+    }, 500)
+    return interval
+  }
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0]
     if (file && file.type === 'application/pdf') {
       setSelectedFile(file)
-      console.log('File selected:', file.name)
+      setIsUploading(true)
+      const interval = startSimulatedProgress()
+      setTimeout(() => {
+        clearInterval(interval)
+        setUploadProgress(100)
+      }, 5000) // fake 5s upload
     }
   }, [])
 
@@ -150,7 +172,7 @@ export default function UploadDropzone() {
     accept: {
       'application/pdf': ['.pdf']
     },
-    maxSize: 16 * 1024 * 1024, // 16MB
+    maxSize: 16 * 1024 * 1024,
     onDrop
   })
 
@@ -177,6 +199,22 @@ export default function UploadDropzone() {
               <div className="px-3 py-2 h-full text-sm truncate">
                 {(selectedFile || acceptedFiles[0])?.name}
               </div>
+            </div>
+          )}
+
+          {isUploading && (
+            <div className="w-full mt-4 max-w-xs mx-auto">
+              <Progress
+                indicatorColor={uploadProgress === 100 ? 'bg-green-500' : ''}
+                value={uploadProgress}
+                className="h-1 w-full bg-zinc-200"
+              />
+              {uploadProgress === 100 && (
+                <div className="flex gap-1 items-center justify-center text-sm text-zinc-700 text-center pt-2">
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  Redirecting...
+                </div>
+              )}
             </div>
           )}
 
