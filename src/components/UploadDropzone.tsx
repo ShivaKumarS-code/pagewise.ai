@@ -129,14 +129,13 @@ export default function UploadDropzone() {
 }*/
 
 
-
-import { useState } from 'react'
+import { useState, ChangeEvent } from 'react'
 
 export default function UploadDropzone() {
-  const [selectedFile, setSelectedFile] = useState(null)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
-  const handleFileSelect = (e) => {
-    const file = e.target.files[0]
+  const handleFileSelect = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
     if (file && file.type === 'application/pdf') {
       setSelectedFile(file)
       console.log('File selected:', file.name)
