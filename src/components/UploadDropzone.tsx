@@ -1,6 +1,6 @@
 'use client'
 
-import { useDropzone } from 'react-dropzone' // ✅ Correct import
+/*import { useDropzone } from 'react-dropzone' // ✅ Correct import
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Cloud, File, Loader2 } from 'lucide-react'
@@ -123,6 +123,49 @@ export default function UploadDropzone() {
 
           <input {...getInputProps()} type="file" id="dropzone-file" className="hidden" />
         </label>
+      </div>
+    </div>
+  )
+}*/
+
+
+
+import { useState } from 'react'
+
+export default function UploadDropzone() {
+  const [selectedFile, setSelectedFile] = useState(null)
+
+  const handleFileSelect = (e) => {
+    const file = e.target.files[0]
+    if (file && file.type === 'application/pdf') {
+      setSelectedFile(file)
+      console.log('File selected:', file.name)
+    }
+  }
+
+  return (
+    <div className="border h-64 m-4 border-dashed border-gray-300 rounded-lg">
+      <div className="flex items-center justify-center h-full w-full">
+        <div>
+          <input
+            type="file"
+            accept=".pdf"
+            onChange={handleFileSelect}
+            className="hidden"
+            id="file-upload"
+          />
+          <label 
+            htmlFor="file-upload"
+            className="cursor-pointer bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
+            Select PDF File
+          </label>
+          {selectedFile && (
+            <p className="mt-2 text-sm text-gray-600">
+              Selected: {selectedFile.name}
+            </p>
+          )}
+        </div>
       </div>
     </div>
   )
