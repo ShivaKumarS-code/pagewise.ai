@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  reactStrictMode: true,
+
+  output: 'standalone', // Helps Vercel with optimized serverless deployment
+
   async redirects() {
     return [
       {
@@ -16,13 +20,10 @@ const nextConfig = {
   },
 
   images: {
-    domains: ['lh3.googleusercontent.com'], // Add the hostname here
+    domains: ['lh3.googleusercontent.com'],
   },
 
-  webpack: (
-    config,
-    { buildId, dev, isServer, defaultLoaders, webpack }
-  ) => {
+  webpack: (config, { webpack }) => {
     config.resolve.alias.canvas = false
     config.resolve.alias.encoding = false
     return config
