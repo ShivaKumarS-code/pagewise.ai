@@ -128,46 +128,57 @@ export default function UploadDropzone() {
   )
 }*/
 
+
 import { useDropzone } from 'react-dropzone'
 import { useUploadThing } from '@/lib/uploadthing'
 import { useCallback, useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 export default function UploadDropzone() {
+  const router = useRouter()
   const [uploading, setUploading] = useState(false)
-  const [uploadedUrl, setUploadedUrl] = useState<string | null>(null)
+  const [uploadComplete, setUploadComplete] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const { startUpload } = useUploadThing('pdfUploader')
 
-  const onDrop = useCallback(async (acceptedFiles: File[]) => {
-    const file = acceptedFiles[0]
-    if (!file) return
+  const onDrop = useCallback(
+    async (acceptedFiles: File[]) => {
+      const file = acceptedFiles[0]
+      if (!file) return
 
-    setUploading(true)
-    setUploadedUrl(null)
-    setError(null)
+      setUploading(true)
+      setUploadComplete(false)
+      setError(null)
 
-    try {
-      const res = await startUpload([file])
-      console.log('Upload response:', res)
+      try {
+        const res = await startUpload([file])
+        console.log('Upload response:', res)
 
-      if (res && res.length > 0) {
-        setUploadedUrl(res[0].url)
-      } else {
-        setError('Upload failed. Try again.')
+        if (res && res.length > 0) {
+          setUploadComplete(true)
+
+          // Wait ~2 seconds before redirecting to allow file to appear
+          setTimeout(() => {
+            router.push('/dashboard') // change this to your actual dashboard route
+          }, 2000)
+        } else {
+          setError('Upload failed. Try again.')
+        }
+      } catch (err) {
+        console.error('Upload error:', err)
+        setError('Something went wrong during upload.')
+      } finally {
+        setUploading(false)
       }
-    } catch (err) {
-      console.error('Upload error:', err)
-      setError('Something went wrong during upload.')
-    } finally {
-      setUploading(false)
-    }
-  }, [startUpload])
+    },
+    [startUpload, router]
+  )
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: { 'application/pdf': ['.pdf'] },
-    maxFiles: 1
+    maxFiles: 1,
   })
 
   return (
@@ -184,13 +195,8 @@ export default function UploadDropzone() {
               <div className="h-full w-full animate-pulse bg-blue-500 rounded" />
             </div>
           </div>
-        ) : uploadedUrl ? (
-          <p className="text-green-600">
-            ✅ Upload complete!{' '}
-            <a href={uploadedUrl} target="_blank" className="underline text-blue-600">
-              View file
-            </a>
-          </p>
+        ) : uploadComplete ? (
+          <p className="text-green-600">✅ Upload complete! Redirecting...</p>
         ) : isDragActive ? (
           <p>Drop the PDF here...</p>
         ) : (
