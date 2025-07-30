@@ -26,8 +26,12 @@ const Page = async ({ params }: PageProps) => {
     },
   })
 
+  // This is the crucial debugging line to check the server logs
+  console.log('--- SERVER LOG: FILE OBJECT FROM DB ---', file)
+
   if (!file) notFound()
 
+  // The 'url' prop below is likely receiving null, causing the error
   return (
     <div className='flex-1 justify-between flex flex-col h-[calc(100vh-3.5rem)]'>
       <div className='mx-auto w-full max-w-8xl grow lg:flex xl:px-2'>
