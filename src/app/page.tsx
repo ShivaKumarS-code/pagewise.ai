@@ -3,8 +3,12 @@ import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { buttonVariants } from '@/components/ui/button'
 import Image from 'next/image'
+import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
 
 export default function Home() {
+  const { getUser } = getKindeServerSession()
+  const user = getUser()
+
   return (
     <>
       <MaxWidthWrapper className='mb-12 mt-28 sm:mt-24 flex flex-col items-center justify-center text-center'>
@@ -29,7 +33,7 @@ export default function Home() {
             size: 'lg',
             className: 'mt-5',
           })}
-          href='/dashboard'
+          href={user ? '/dashboard' : '/api/auth/register'}
           target='_blank'>
           Get started{' '}
           <ArrowRight className='ml-2 h-5 w-5' />
@@ -108,7 +112,7 @@ export default function Home() {
               </span>
               <span className='mt-2 text-zinc-700'>
                 Sign up with your email and start using <span className='text-blue-700'><Link
-                  href='/dashboard'
+                  href={user ? '/dashboard' : '/api/auth/register'}
                   className='text-blue-700 underline underline-offset-2'>
                     PageWise.ai
                 </Link></span> for free.
