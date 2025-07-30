@@ -1,6 +1,6 @@
 'use client'
 
-import { useDropzone } from 'react-dropzone' 
+/*import { useDropzone } from 'react-dropzone' 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Cloud, File, Loader2 } from 'lucide-react'
@@ -126,7 +126,7 @@ export default function UploadDropzone() {
       </div>
     </div>
   )
-}
+} */
 
 /*
 import { useDropzone } from 'react-dropzone'
@@ -212,7 +212,7 @@ export default function UploadDropzone() {
 }
 */
 
-/*
+
 
 import { useDropzone } from 'react-dropzone' 
 import { useState, useEffect } from 'react'
@@ -334,7 +334,7 @@ export default function UploadDropzone() {
 
           {isUploading && (
             <div className="w-full mt-4 max-w-xs mx-auto">
-              {/* Custom progress bar replacing the Progress component *//*}
+              {/* Custom progress bar replacing the Progress component */}
               <div className="h-1 w-full bg-zinc-200 rounded-full overflow-hidden">
                 <div 
                   className={`h-full rounded-full transition-all duration-300 ease-out ${
@@ -358,4 +358,4 @@ export default function UploadDropzone() {
       </div>
     </div>
   )
-}*/
+}
