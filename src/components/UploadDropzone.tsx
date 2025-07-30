@@ -212,7 +212,7 @@ export default function UploadDropzone() {
 }
 */
 
-'use client'
+
 
 import { useDropzone } from 'react-dropzone' 
 import { useState, useEffect } from 'react'
