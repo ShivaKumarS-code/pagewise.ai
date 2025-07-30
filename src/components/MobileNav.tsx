@@ -81,7 +81,6 @@ const MobileNav = ({ isAuth }: { isAuth: boolean }) => {
                 </li>
                 <li className='my-3 h-px w-full bg-gray-300' />
                 <li>
-                  {/* FIXED: Use button with onClick handler instead of Link */}
                   <button
                     onClick={handleLogout}
                     className='flex items-center w-full font-semibold text-left'>

@@ -39,7 +39,7 @@ export function constructMetadata({
       ]
     },
     icons,
-   // metadataBase: new URL(''),
+    metadataBase: new URL('https://pagewise-ai-steel.vercel.app'),
     themeColor: '#FFF',
     ...(noIndex && {
       robots: {

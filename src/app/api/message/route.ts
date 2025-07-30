@@ -85,28 +85,39 @@ export const POST = async (req: NextRequest) => {
     parts: msg.text,
   }))
 
-  console.log('DEBUG: GEMINI_API_KEY for generateContentStream:', process.env.GEMINI_API_KEY);
-  const response = await model.generateContentStream({
-    contents: [
-      {
-        role: 'user',
-        parts: [
-          {
-            text: `Use the following pieces of context (or previous conversaton if needed) to answer the users question in markdown format. \nIf you don't know the answer, just say that you don't know, don't try to make up an answer.\n----------------\n\nPREVIOUS CONVERSATION:\n${formattedPrevMessages.map((message) => {
+  const prompt = `Use the following pieces of context (or previous conversaton if needed) to answer the users question in markdown format. 
+If you don't know the answer, just say that you don't know, don't try to make up an answer.
+----------------
+
+PREVIOUS CONVERSATION:
+${formattedPrevMessages.map((message) => {
               if (message.role === 'user')
                 return `User: ${message.parts}\n`
               return `Model: ${message.parts}\n`
-            }).join('')}\n----------------\n\nCONTEXT:\n${results.map((r) => r.pageContent).join('\n\n')}\n\nUSER INPUT: ${message}`,
-          },
-        ],
-      },
-    ],
-  })
+            }).join('')}
+----------------
 
-  let acc = ''
-  for await (const chunk of response.stream) {
-    acc += chunk.text()
-  }
+CONTEXT:
+${results.map((r) => r.pageContent).join('\n\n')}\n\nUSER INPUT: ${message}`;
+
+  const cerebrasResponse = await fetch('https://api.cerebras.ai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${process.env.CEREBRAS_API_KEY}`
+    },
+    body: JSON.stringify({
+      model: 'qwen-3-235b-a22b-instruct-2507',
+      messages: [{
+        role: 'user',
+        content: prompt
+      }],
+      stream: false
+    })
+  });
+
+  const responseData = await cerebrasResponse.json();
+  const acc = responseData.choices[0].message.content;
 
   await db.message.create({
     data: {
