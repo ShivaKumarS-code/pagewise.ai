@@ -22,6 +22,15 @@ const MobileNav = ({ isAuth }: { isAuth: boolean }) => {
     }
   }
 
+  // Add logout handler
+  const handleLogout = async () => {
+    try {
+      window.location.href = '/api/auth/logout'
+    } catch (error) {
+      console.error('Logout failed:', error)
+    }
+  }
+
   return (
     <div className='sm:hidden'>
       <Menu
@@ -72,12 +81,12 @@ const MobileNav = ({ isAuth }: { isAuth: boolean }) => {
                 </li>
                 <li className='my-3 h-px w-full bg-gray-300' />
                 <li>
-                  {/* --- THIS IS THE FIX USING THE ALTERNATE METHOD --- */}
-                  <Link
-                    href='/api/auth/logout'
-                    className='flex items-center w-full font-semibold'>
+                  {/* FIXED: Use button with onClick handler instead of Link */}
+                  <button
+                    onClick={handleLogout}
+                    className='flex items-center w-full font-semibold text-left'>
                     Sign out
-                  </Link>
+                  </button>
                 </li>
               </>
             )}
